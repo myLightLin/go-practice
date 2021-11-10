@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"sort"
 )
 
@@ -23,27 +24,46 @@ var prereqs = map[string][]string{
 	"networks":              {"operating systems"},
 	"operating systems":     {"data structures", "computer organization"},
 	"programming languages": {"data structures", "computer organization"},
+
+	"linear algebra": {"calculus"},
 }
 
 func main() {
-	for i, course := range topoSort(prereqs) {
+	sorted, err := topoSort(prereqs)
+	if err != nil {
+		log.Println(err)
+	}
+	for i, course := range sorted {
 		fmt.Printf("%d:\t%s\n", i+1, course)
 	}
 }
 
-func topoSort(m map[string][]string) []string {
+func topoSort(m map[string][]string) ([]string, error) {
 	var order []string
 	seen := make(map[string]bool)
-	var visitAll func(items []string)
+	var visitAll func(items []string) error
 
-	visitAll = func(items []string) {
+	visitAll = func(items []string) error {
 		for _, item := range items {
 			if !seen[item] {
 				seen[item] = true
-				visitAll(m[item])
+				if err := visitAll(m[item]); err != nil {
+					return err
+				}
 				order = append(order, item)
+			} else {
+				hasCycle := true
+				for _, s := range order {
+					if s == item {
+						hasCycle = false
+					}
+				}
+				if hasCycle {
+					return fmt.Errorf("has cycle: %s", item)
+				}
 			}
 		}
+		return nil
 	}
 
 	var keys []string
@@ -52,6 +72,10 @@ func topoSort(m map[string][]string) []string {
 	}
 
 	sort.Strings(keys)
-	visitAll(keys)
-	return order
+
+	if err := visitAll(keys); err != nil {
+		return nil, err
+	}
+
+	return order, nil
 }
