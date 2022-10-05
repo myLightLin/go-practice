@@ -6,6 +6,7 @@ require (
 	github.com/cilium/ebpf v0.9.3 // indirect
 	github.com/go-delve/delve v1.9.1 // indirect
 	github.com/inconshreveable/mousetrap v1.0.1 // indirect
+	github.com/kisielk/errcheck v1.6.2 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-runewidth v0.0.14 // indirect
 	github.com/rivo/uniseg v0.4.2 // indirect
